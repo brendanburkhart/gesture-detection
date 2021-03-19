@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropou
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.utils import to_categorical
 
-def train(data_gen, data_dir):
+def train(data_gen, data_dir, epochs):
     train_iter = data_gen.flow_from_directory(
         data_dir,
         **utils.load_options,
@@ -31,7 +31,7 @@ def train(data_gen, data_dir):
         Dropout(0.2),
         Flatten(),
         Dense(128, activation='relu'),
-        Dense(3, activation='softmax')
+        Dense(4, activation='softmax')
     ])
 
     model.compile(
@@ -42,24 +42,24 @@ def train(data_gen, data_dir):
 
     model.fit(
         train_iter,
-        epochs=10,
+        epochs=epochs,
         validation_data=validation_iter,
     )
 
     return model
 
-def main(data):
+def main(data, epochs):
     data_gen = utils.prepare_data()
 
     data_folder = pathlib.Path(data)
     model_folder = pathlib.Path(data).parent / (data_folder.name + "_model")
 
-    model = train(data_gen, str(data_folder))
+    model = train(data_gen, str(data_folder), epochs)
     model.save(str(model_folder))
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print("Please supply data directory as argument")
         exit(-1)
 
-    main(sys.argv[1])
+    main(sys.argv[1], 10)

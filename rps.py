@@ -2,7 +2,7 @@ import utils
 import cv2
 
 def main():
-    model = utils.load_model("model")
+    model = utils.load_model("data_model")
     cap = cv2.VideoCapture(0)
 
     utils.create_window("Display", (900, 600))

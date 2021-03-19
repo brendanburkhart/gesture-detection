@@ -9,15 +9,16 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator, array_to_im
 """
 Keras model input image shape
 """
-model_input_shape = (80, 120, 3)
+model_input_shape = (80, 120, 1)
 
 """
 Image load options for Keras image data generator
 """
 load_options = {
     "class_mode": 'categorical',
+    "color_mode": "grayscale",
     "target_size": (model_input_shape[0], model_input_shape[1]),
-    "batch_size": 64,
+    "batch_size": 32,
 }
 
 """
@@ -63,7 +64,6 @@ def prepare_data():
         brightness_range=[0.7, 1.3],
         shear_range=0.3,
         zoom_range=0.2,
-        preprocessing_function=augment_color,
         fill_mode='nearest',
         validation_split=0.2,
     )
@@ -126,7 +126,7 @@ OpenCV loads images in BGR channel order, while Keras expects RGB.
 def opencv_mat_to_keras_img(mat):
     mat = cv2.cvtColor(mat, cv2.COLOR_BGR2GRAY)
     mat = mat.astype("float32") / 255.0
-    mat = cv2.resize(mat, (60, 40))
+    mat = cv2.resize(mat, (model_input_shape[1], model_input_shape[0]))
     return np.expand_dims(mat, axis=-1)
 
 """
@@ -146,7 +146,7 @@ Given prediction, returns predicted label and probability of the more probable
 category.
 """
 def label(prediction):
-    class_names = ['Paper', 'Rock', 'Scissors']
+    class_names = ['None', 'Paper', 'Rock', 'Scissors']
     index = np.argmax(prediction)
     return (class_names[index], prediction[index])
 
